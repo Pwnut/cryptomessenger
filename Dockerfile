@@ -16,4 +16,4 @@ RUN mkdir /app
 COPY rsa_example.py /app
 
 WORKDIR /app
-CMD ["python3", "rsa_example.py"]
+#CMD ["python3", "rsa_example.py"]

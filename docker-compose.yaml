@@ -1,0 +1,10 @@
+services:
+  node1:
+    image: cryptomessenger
+    tty: true
+  node2:
+    image: cryptomessenger
+    tty: true
+networks:
+  default:
+    driver: bridge
