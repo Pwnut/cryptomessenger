@@ -1,3 +1,4 @@
 .venv
 proto/*.py
+db_stuff/proto/*.py
 *.swp
