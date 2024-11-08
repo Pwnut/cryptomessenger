@@ -1,9 +1,9 @@
 services:
-  node1:
+  app:
     image: cryptomessenger
     tty: true
-  node2:
-    image: cryptomessenger
+  database:
+    image: cm-sql-server
     tty: true
 networks:
   default:
