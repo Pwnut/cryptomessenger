@@ -1,0 +1,10 @@
+services:
+  app:
+    image: cryptomessenger
+    tty: true
+  database:
+    image: cm-sql-server
+    tty: true
+networks:
+  default:
+    driver: bridge
