@@ -1,4 +1,0 @@
-CREATE DATABASE CryptomessengerDB;
-GO
-ALTER AUTHORIZATION ON DATABASE::CryptomessengerDB TO sa;
-GO
