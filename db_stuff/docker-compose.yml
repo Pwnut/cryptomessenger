@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  sqlserver:
+    build: .
+    container_name: sqlserver_container
+    ports:
+      - "1434:1433"
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=WeHacking808
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+      - ./init-db.sql:/init-db.sql
+    user: root
+
+volumes:
+  sqlserver_data:
+    driver: local
