@@ -6,7 +6,7 @@ import pyodbc
 # It is used for testing both connectivity and basic CRUD operations.
 
 # Connection settings
-server = 'sqlserver,1434'  # Adjust port if different
+server = 'sqlserver,1433'  # Adjust port if different
 database = 'CryptomessengerDB'
 username = 'SA'
 password = 'WeHacking808'
@@ -14,7 +14,7 @@ password = 'WeHacking808'
 # Establish connection
 try:
     conn = pyodbc.connect(
-        f"DRIVER={{ODBC Driver 18 for SQL Server}};SERVER={server};DATABASE={database};UID={username};PWD={password};Trust Server Certificate=True;"
+        f"DRIVER={{ODBC Driver 18 for SQL Server}};SERVER={server};DATABASE={database};UID={username};PWD={password};TrustServerCertificate=YES;"
     )
     print("Connection successful!")
 except pyodbc.Error as e:

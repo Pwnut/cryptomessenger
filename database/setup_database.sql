@@ -1,8 +1,8 @@
 -- setup_database.sql
 USE master;
-CREATE DATABASE Cryptomessenger_DB;
+CREATE DATABASE CryptomessengerDB;
 GO
-USE Cryptomessenger_DB;
+USE CryptomessengerDB;
 
 -- Create Users Table
 CREATE TABLE Users (

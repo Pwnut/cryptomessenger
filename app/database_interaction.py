@@ -5,7 +5,7 @@ import pyodbc
 # It serves as a basic test for database connectivity and schema verification.
 
 # Connection settings
-server = 'sqlserver,1434'  # Change to the port if modified in Docker setup
+server = 'sqlserver,1433'  # Change to the port if modified in Docker setup
 database = 'CryptomessengerDB'
 username = 'SA'
 password = 'WeHacking808'  # Use the same SA password from the Docker setup
@@ -13,7 +13,7 @@ password = 'WeHacking808'  # Use the same SA password from the Docker setup
 # Establish connection
 try:
     connection = pyodbc.connect(
-        f"DRIVER={{ODBC Driver 18 for SQL Server}};SERVER={server};DATABASE={database};UID={username};PWD={password};Trust Server Certificate=True;"
+        f"DRIVER={{ODBC Driver 18 for SQL Server}};SERVER={server};DATABASE={database};UID={username};PWD={password};TrustServerCertificate=YES;"
     )
     print("Connection successful!")
 except pyodbc.Error as e:
