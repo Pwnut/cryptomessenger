@@ -1,6 +1,7 @@
 .venv
+venv
 *.swp
 *.pem
-proto/*.py
+proto/
 db_stuff/proto/*.py
 *.swp
