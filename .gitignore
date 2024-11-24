@@ -1,7 +1,6 @@
 .venv
 *.swp
 *.pem
-proto/*.py
-db_stuff/proto/*.py
+proto/
 *.swp
 __pycache__
