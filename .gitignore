@@ -4,3 +4,4 @@
 proto/*.py
 db_stuff/proto/*.py
 *.swp
+__pycache__
