@@ -1,0 +1,7 @@
+.venv
+venv
+*.swp
+*.pem
+proto/
+*.swp
+__pycache__

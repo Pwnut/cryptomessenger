@@ -1,0 +1,28 @@
+services:
+  app:
+    build: ./app/
+    container_name: messenger_app
+    tty: true
+    depends_on:
+      - sqlserver
+  sqlserver:
+    build: ./database/
+    container_name: sqlserver_container
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=WeHacking808
+      - MSSQL_TRUST_SERVER_CERTIFICATE=YES
+    volumes:
+      - ./database:/tmp
+      - sqlserver_data:/var/opt/mssql
+    user: root
+    command: /tmp/start.sh
+    tty: true
+
+volumes:
+  sqlserver_data:
+    driver: local
+
+networks:
+  default:
+    driver: bridge
