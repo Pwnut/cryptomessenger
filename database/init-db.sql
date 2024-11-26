@@ -1,11 +1,5 @@
 CREATE DATABASE CryptomessengerDB;
 GO
-ALTER AUTHORIZATION ON DATABASE::CryptomessengerDB TO sa;
-GO
--- setup_database.sql
-USE master;
-CREATE DATABASE CryptomessengerDB;
-GO
 USE CryptomessengerDB;
 
 -- Create Users Table
@@ -13,6 +7,7 @@ CREATE TABLE Users (
     UserID INT PRIMARY KEY IDENTITY(1,1),
     Username NVARCHAR(50) NOT NULL UNIQUE,
     PublicKey NVARCHAR(MAX) NOT NULL,
+    IP NVARCHAR(15) NULL, --added ip field 
     IsOnline BIT DEFAULT 0
 );
 
@@ -28,7 +23,7 @@ CREATE TABLE Contacts (
 
 -- Create Messages Table
 CREATE TABLE Messages (
-    MessageID INT PRIMARY KEY IDENTITY(1,1),
+    MessageID NVARCHAR(36) PRIMARY KEY, --changed to string
     SenderID INT NOT NULL,
     RecipientID INT NOT NULL,
     MessageContent NVARCHAR(MAX) NOT NULL,
@@ -44,22 +39,4 @@ CREATE TABLE Status (
     StatusChange BIT NOT NULL,
     Timestamp DATETIME DEFAULT GETDATE(),
     FOREIGN KEY (UserID) REFERENCES Users(UserID)
-);
-
--- Create Devices Table
-CREATE TABLE Devices (
-    DeviceID INT PRIMARY KEY IDENTITY(1,1),
-    UserID INT NOT NULL,
-    DeviceName NVARCHAR(100),
-    MACAddress NVARCHAR(17) NOT NULL,
-    FOREIGN KEY (UserID) REFERENCES Users(UserID)
-);
-
--- Create Device_Connections Table
-CREATE TABLE Device_Connections (
-    ConnectionID INT PRIMARY KEY IDENTITY(1,1),
-    DeviceID INT NOT NULL,
-    IPAddress NVARCHAR(45) NOT NULL,  -- Supports IPv6 addresses
-    LoginTimestamp DATETIME DEFAULT GETDATE(),
-    FOREIGN KEY (DeviceID) REFERENCES Devices(DeviceID)
 );
