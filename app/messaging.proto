@@ -18,8 +18,7 @@ message MessageAck {
 
 message RegInfo {
     Header header = 1;
-    string name = 2;
-    string pub_key = 3;
+    bytes pub_key = 2;
 }
 /*
 message KeyRevocation {

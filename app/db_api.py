@@ -38,6 +38,7 @@ def register_user(ip, public_key, is_online=1, username=None):
         
         cursor = conn.cursor()
         print("Executing SQL query to register user...")
+        print(f'{ip}:{public_key}:{username}')
         cursor.execute("""
             INSERT INTO Users (Username, IP, PublicKey, IsOnline)
             VALUES (?, ?, ?, ?)
@@ -166,6 +167,7 @@ def get_pub_key(ip):
     except Exception as e:
         print(f"Error occurred: {e}")
         return {"error": str(e)}
+
 def get_priv_key():
     # Placeholder implementation for private key retrieval
     try:
@@ -175,7 +177,7 @@ def get_priv_key():
         return {"error": str(e)}
 
 # Function to save a message to the database
-def save_message(ip, timestamp, message_id, message):
+def save_message(sender_ip, recipient_ip, timestamp, message_id, message):
     try:
         print("Establishing database connection...")
         conn = get_db_connection()
@@ -184,11 +186,11 @@ def save_message(ip, timestamp, message_id, message):
         cursor = conn.cursor()
         print("Executing SQL query to save message...")
         cursor.execute("""
-            INSERT INTO Messages (SenderID, Timestamp, MessageID, MessageContent)
+            INSERT INTO Messages (SenderID, RecipientID, Timestamp, MessageID, MessageContent)
             VALUES (
-                (SELECT UserID FROM Users WHERE IP = ?), ?, ?, ?
+                (SELECT UserID FROM Users WHERE IP = ?), (SELECT UserID FROM Users WHERE IP = ?), ?, ?, ?
             )
-        """, (ip, timestamp, message_id, message))
+        """, (sender_ip, recipient_ip, timestamp, message_id, message))
         conn.commit()
         print("Query executed successfully. Message saved.")
         

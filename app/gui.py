@@ -2,7 +2,17 @@ import tkinter as tk
 from tkinter import messagebox
 from datetime import datetime
 import random
-from API import register_user, get_user, save_message  # Import your API functions
+from db_api import register_user, get_user, save_message  # Import your API functions
+from multiprocessing import Process, Queue
+import server
+import client
+import db_api
+
+# start server
+# events that can come through: new_msg, new_user, user_online
+queue = Queue()
+messaging_server = Process(target=server.start_messenger_server,args=(queue,))
+messaging_server.start()
 
 # Initialize main window
 root = tk.Tk()
@@ -66,6 +76,7 @@ def load_contacts():
         messagebox.showerror("Error", f"Failed to load contacts: {e}")
         return ["No Users Available"]
 
+# TODO how can we refresh this?
 # Load contacts and initialize the OptionMenu
 contacts = load_contacts()
 user_selection = tk.StringVar(content_frame)
@@ -134,18 +145,54 @@ def register_contact():
 def send_message():
     recipient = user_selection.get()
     message = message_entry.get()
+    print(recipient)
+    print(message)
     if recipient and message:
-        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        response = save_message("192.168.1.1", timestamp, f"msg_{random.randint(1000,9999)}", message)
-        if "message" in response:
-            add_message_to_history(f"You to {recipient}: {message}")
-            message_sent_label.config(text=f"Message Sent to {recipient}")
+        acked_mid = client.send_message(message, host=recipient)
+        if acked_mid:
+            timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            response = save_message("127.0.0.1", recipient, timestamp, acked_mid, message)
+            if "message" in response:
+                add_message_to_history(f"You to {recipient}: {message}")
+                message_sent_label.config(text=f"Message Sent to {recipient}")
+            else:
+                messagebox.showerror("Error", response.get("error", "Unknown error occurred"))
         else:
-            messagebox.showerror("Error", response.get("error", "Unknown error occurred"))
+            message_sent_label.config(text=f"Message NOT sent to {recipient}")
     else:
         messagebox.showerror("Error", "Select a user and enter a message.")
 
 # Send Message Button
 tk.Button(content_frame, text="Send Message", command=send_message, bg="black", fg="green").pack(pady=5)
 
+def poll_queue():
+    global queue
+    try:
+        while not queue.empty():
+            event = queue.get_nowait()
+            #new_msg, new_user, user_online
+            if event["type"] == "new_msg":
+                sender_ip = event["sender_ip"]
+                message_id = event["message_id"]
+                new_msg = event["new_msg"]
+                # TODO replace with timestamp from actual packet
+                timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                response = save_message(sender_ip, "127.0.0.1", timestamp, message_id, new_msg)
+                if "message" in response:
+                    add_message_to_history(f"{sender_ip} to you: {new_msg}")
+                else:
+                    messagebox.showerror("Error", response.get("error", "Unknown error occurred"))
+            elif event["type"] == "new_user":
+                print(event["sender_ip"])
+            elif event["type"] == "user_online":
+                print(event["sender_ip"])
+    except Exception as e:
+        print(f"Error reading queue: {e}")
+
+    # Continue polling
+    root.after(100, poll_queue)
+
+poll_queue()
+
 root.mainloop()
+messaging_server.terminate()

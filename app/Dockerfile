@@ -31,10 +31,12 @@ COPY client.py /app
 COPY server.py /app
 COPY messaging.proto /app
 COPY encryption.py /app
+COPY db_api.py /app
+COPY gui.py /app
 
 #compile proto
 RUN curl -LO https://github.com/protocolbuffers/protobuf/releases/download/v25.1/protoc-25.1-linux-x86_64.zip
-RUN apt install unzip -y
+RUN apt install unzip python3-tk -y
 RUN mkdir /app/.local
 RUN unzip protoc-25.1-linux-x86_64.zip -d /app/.local
 ENV PATH="$PATH:/app/.local/bin"

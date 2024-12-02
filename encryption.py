@@ -22,6 +22,7 @@ def serialize_priv_key(key: bytes) -> bytes:
     )
 
 def unserialize_pub_key(serialized_key: bytes) -> bytes:
+    print(serialized_key)
     return serialization.load_pem_public_key(serialized_key)
 
 def unserialize_priv_key(serialized_key: bytes) -> bytes:
@@ -44,6 +45,10 @@ def gen_key_pair():
         f.write(public_pem)
 
 def encrypt_message(msg: bytes, public_key: bytes) -> bytes:
+    # TODO
+    # public_key = get_pub_key(host)
+    print(f'msg: {msg}')
+    print(f'pub_key: {pub_key}')
     ciphertext = public_key.encrypt(
         msg,
         padding.OAEP(
@@ -55,6 +60,10 @@ def encrypt_message(msg: bytes, public_key: bytes) -> bytes:
     return ciphertext
 
 def decrypt_message(c_msg: bytes, private_key: bytes) -> bytes:
+    # TODO
+    # private_key = get_priv_key()
+    print(f'c_msg: {c_msg}')
+    print(f'priv_key: {priv_key}')
     plaintext = private_key.decrypt(
         c_msg,
         padding.OAEP(
