@@ -6,6 +6,8 @@ services:
       - DISPLAY=$DISPLAY
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
+    ports:
+      - "5000:5000"
     tty: true
     depends_on:
       - sqlserver
