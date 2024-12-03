@@ -3,7 +3,6 @@ syntax = "proto3";
 message Header {
     uint32 timestamp = 1;
     string message_id = 2;
-    // string signature = 4;
 }
 
 message Message {
@@ -32,5 +31,5 @@ message MessageWrapper {
         bool ping = 3;
         bool pong = 4;
     }
-    // optional string signature = 10;
+    // string signature = 10;
 }

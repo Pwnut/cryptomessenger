@@ -75,32 +75,6 @@ def send_ping(host='127.0.0.1', port=5000):
         else: # didnt get reg (or complete reg) message back
             return False
 
-#def retry_send(host, port, unsent_packets):
-#    for p in unsent_packets:
-#        try:
-#            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-#                s.connect((central_host, central_port))
-#
-#                s.send(packet)
-#
-#                size_bytes = s.recv(4)
-#                resp_size = int.from_bytes(size_bytes, 'big')
-#                resp_data = client_socket.recv(resp_size)
-#                received_message = messaging_pb2.MessageWrapper()
-#                received_message.ParseFromString(message_data)
-#                return received_message
-#        except ConnectionRefusedError:
-#            sleep(2)
-
-#def send_when_up(message, host='127.0.0.1', port=5000):
-#    if host in unsent_lists:
-#        unsent_lists[host].append(message)
-#    else:
-#        new_unsent_list = manager.list()
-#        new_unsent_list.append(message)
-#        unsent_lists[host] = new_unsent_list
-#        multiprocessing.Process(target=retry_send, args=(host, port, new_unsent_list))
-
 def send_reg_request(host='127.0.0.1', port=5000):
     # TODO
     ser_pub_key = serialize_pub_key(public_key)

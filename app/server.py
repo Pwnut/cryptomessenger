@@ -23,7 +23,6 @@ def handle_client(conn, addr, queue):
     received_message.ParseFromString(message_data)
     if received_message.HasField('reg'):
         register_user(addr[0], received_message.reg.pub_key.decode(), username=addr[0])
-        # TODO refresh GUI with new contact
         queue.put({'type':'new_user', 'sender_ip':addr[0]})
         ser_pub_key = serialize_pub_key(public_key)
         reg_resp = messaging_pb2.MessageWrapper(reg=messaging_pb2.RegInfo(
@@ -45,8 +44,6 @@ def handle_client(conn, addr, queue):
             msg.ParseFromString(dec_msg)
             mid = msg.header.message_id
             new_msg = msg.plaintext
-            # TODO save message: msg.plaintext
-            # TODO also refresh gui with new message
             queue.put({'type':'new_msg', 'sender_ip':addr[0], 'message_id':mid, 'new_msg':new_msg})
             msg_ack = messaging_pb2.MessageAck(header=create_header(), acked_mid=mid)
             unser_pub_key = unserialize_pub_key(get_pub_key(addr[0]).encode())
@@ -56,7 +53,6 @@ def handle_client(conn, addr, queue):
             serialized_resp = response.SerializeToString()
             conn.sendall(len(serialized_resp).to_bytes(4, 'big') + serialized_resp)
     elif received_message.HasField('ping'):
-        # TODO show user that addr[0] is online
         queue.put({'type':'user_online', 'sender_ip':addr[0]})
         response = messaging_pb2.MessageWrapper(pong=True)
         serialized_resp = response.SerializeToString()
