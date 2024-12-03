@@ -1,6 +1,7 @@
 from cryptography.hazmat.primitives import serialization, hashes
 from cryptography.hazmat.primitives.asymmetric import rsa, padding
 from os.path import isfile
+from db_api import delete_user, register_user
 
 PUB_PATH='pub.pem'
 PRIV_PATH='priv.pem'
@@ -73,3 +74,6 @@ with open(PRIV_PATH,'rb') as f:
 
 with open(PUB_PATH,'rb') as f:
     public_key = serialization.load_pem_public_key(f.read())
+# repopulate this every time we boot
+delete_user('127.0.0.1')
+register_user('127.0.0.1', serialize_pub_key(public_key))

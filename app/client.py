@@ -20,6 +20,7 @@ def send_packet(packet_data, host='127.0.0.1', port=5000):
     packet = len(serialized_packet).to_bytes(4, 'big') + serialized_packet
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.bind(('0.0.0.0',5002))
             s.connect((host, port))
 
             s.send(packet)
@@ -112,7 +113,7 @@ def send_reg_request(host='127.0.0.1', port=5000):
         if response.HasField('reg'):
             print(f'pub key on client side: {response.reg.pub_key}')
             # TODO
-            register_user(host, response.reg.pub_key)
+            register_user(host, response.reg.pub_key.decode())
             return True
         else: # didnt get reg (or complete reg) message back
             return False

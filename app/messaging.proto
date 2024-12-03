@@ -20,11 +20,7 @@ message RegInfo {
     Header header = 1;
     bytes pub_key = 2;
 }
-/*
-message KeyRevocation {
-    Header header = 1;
-}
-*/
+
 message EncryptedMessage {
     bytes ciphertext = 1;
 }
