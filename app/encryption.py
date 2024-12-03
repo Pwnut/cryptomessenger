@@ -76,4 +76,4 @@ with open(PUB_PATH,'rb') as f:
     public_key = serialization.load_pem_public_key(f.read())
 # repopulate this every time we boot
 delete_user('127.0.0.1')
-register_user('127.0.0.1', serialize_pub_key(public_key))
+register_user('127.0.0.1', serialize_pub_key(public_key).decode())

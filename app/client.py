@@ -20,6 +20,7 @@ def send_packet(packet_data, host='127.0.0.1', port=5000):
     packet = len(serialized_packet).to_bytes(4, 'big') + serialized_packet
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             s.bind(('0.0.0.0',5002))
             s.connect((host, port))
 
@@ -35,7 +36,7 @@ def send_packet(packet_data, host='127.0.0.1', port=5000):
         print(f'{host} not available')
         return None
 
-def send_message(pm, host='127.0.0.1', port=5000):
+def send_message(pm, host='127.0.0.1', port=5000, preview=False):
     msg = messaging_pb2.Message(header=create_header(),
                                         plaintext=pm
                                     )
@@ -45,6 +46,8 @@ def send_message(pm, host='127.0.0.1', port=5000):
         return False
     unser_pub_key = unserialize_pub_key(pub_key.encode())
     ciphertext = encrypt_message(serialized_msg, unser_pub_key)
+    if preview:
+        return ciphertext
     enc_msg = messaging_pb2.EncryptedMessage(ciphertext=ciphertext)
     wrapped_msg = messaging_pb2.MessageWrapper(enc_msg=enc_msg)
     response = send_packet(wrapped_msg, host=host, port=port)
@@ -113,8 +116,7 @@ def send_reg_request(host='127.0.0.1', port=5000):
         if response.HasField('reg'):
             print(f'pub key on client side: {response.reg.pub_key}')
             # TODO
-            register_user(host, response.reg.pub_key.decode())
-            return True
+            return register_user(host, response.reg.pub_key.decode())
         else: # didnt get reg (or complete reg) message back
             return False
 

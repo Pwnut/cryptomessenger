@@ -120,22 +120,31 @@ message_entry.pack()
 
 # Preview Encryption Button
 def preview_encryption():
+    recipient = user_selection.get()
     message = message_entry.get()
     if message:
-        encrypted_message = message[::-1]  # Placeholder for encryption
+        encrypted_message = client.send_message(message, host=recipient, preview=True)
         messagebox.showinfo("Preview Encrypted Message", f"Encrypted: {encrypted_message}")
     else:
         messagebox.showerror("Error", "Enter a message to encrypt.")
 
 tk.Button(content_frame, text="Preview Encryption", command=preview_encryption, bg="black", fg="green").pack(pady=5)
 
+def update_contacts():
+    global user_menu
+    contacts = load_contacts()
+    user_menu['menu'].delete(0, 'end')
+    for contact in contacts:
+        user_menu['menu'].add_command(label=contact, command=tk._setit(user_selection, contact))
+
 # Define Register Contact function
 def register_contact():
     contact_name = contact_entry.get()
     if contact_name:
-        response = register_user(None, "DummyPublicKey", username=contact_name)
+        response = client.send_reg_request(host=contact_name)
         if "message" in response:
             messagebox.showinfo("Contact Registered", f"{contact_name} has been registered.")
+            update_contacts()
         else:
             messagebox.showerror("Error", response.get("error", "Unknown error occurred"))
     else:
@@ -184,6 +193,7 @@ def poll_queue():
                     messagebox.showerror("Error", response.get("error", "Unknown error occurred"))
             elif event["type"] == "new_user":
                 print(event["sender_ip"])
+                update_contacts()
             elif event["type"] == "user_online":
                 print(event["sender_ip"])
     except Exception as e:
