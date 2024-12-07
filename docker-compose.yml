@@ -25,6 +25,30 @@ services:
     command: /tmp/start.sh
     tty: true
 
+  good_test_node:
+    build: ./test_node/
+    container_name: messenger_test_node
+    tty: true
+    depends_on:
+      - sqlserver_good_test_node
+    profiles:
+      - testing
+  sqlserver_good_test_node:
+    build: ./database/
+    container_name: sqlserver_test_node
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=WeHacking808
+      - MSSQL_TRUST_SERVER_CERTIFICATE=YES
+    volumes:
+      - ./database:/tmp
+      - ./test_node/test_data:/var/opt/mssql
+    user: root
+    command: /tmp/start.sh
+    tty: true
+    profiles:
+      - testing
+
 volumes:
   sqlserver_data:
     driver: local

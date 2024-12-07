@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+message Header {
+    uint32 timestamp = 1;
+    string message_id = 2;
+}
+
+message Message {
+    Header header = 1;
+    string plaintext = 2;
+}
+
+message MessageAck {
+    Header header = 1;
+    string acked_mid = 2;
+}
+
+message RegInfo {
+    Header header = 1;
+    bytes pub_key = 2;
+}
+
+message EncryptedMessage {
+    bytes ciphertext = 1;
+}
+
+message MessageWrapper {
+    oneof msg_type {
+        RegInfo reg = 1;
+        EncryptedMessage enc_msg = 2;
+        bool ping = 3;
+        bool pong = 4;
+    }
+    // string signature = 10;
+}

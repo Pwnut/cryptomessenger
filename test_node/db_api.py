@@ -4,7 +4,7 @@ from datetime import datetime
 # Database configuration dictionary
 DB_CONFIG = {
     'driver': 'ODBC Driver 18 for SQL Server',
-    'server': 'sqlserver,1433',  # Use the container's IP
+    'server': 'sqlserver_good_test_node,1433',  # Use the container's IP
     'database': 'CryptomessengerDB',
     'username': 'SA',
     'password': 'WeHacking808',
@@ -197,59 +197,6 @@ def save_message(sender_ip, recipient_ip, timestamp, message_id, message):
         cursor.close()
         conn.close()
         return {"message": "Message saved successfully."}
-
-    except Exception as e:
-        print(f"Error occurred: {e}")
-        return {"error": str(e)}
-
-def get_messages(ip):
-    """
-    Retrieves messages sent to and from the specified IP address.
-
-    Args:
-        ip (str): The IP address of the user whose messages need to be retrieved.
-
-    Returns:
-        list: A list of messages with details like sender, recipient, timestamp, and content.
-    """
-    try:
-        print(f"Establishing database connection for IP '{ip}'...")
-        conn = get_db_connection()
-        print("Database connection established.")
-
-        cursor = conn.cursor()
-        print(f"Executing SQL query to retrieve messages for IP '{ip}'...")
-        cursor.execute("""
-            SELECT
-                M.Timestamp,
-                U1.Username AS Sender,
-                U2.Username AS Recipient,
-                M.MessageContent
-            FROM Messages M
-            JOIN Users U1 ON M.SenderID = U1.UserID
-            JOIN Users U2 ON M.RecipientID = U2.UserID
-            WHERE U1.IP = ? OR U2.IP = ?
-            ORDER BY M.Timestamp;
-        """, (ip, ip))
-
-        messages = cursor.fetchall()
-        cursor.close()
-        conn.close()
-
-        if not messages:
-            print(f"No messages found for IP '{ip}'.")
-            return []
-
-        print(f"Messages retrieved successfully for IP '{ip}'.")
-        return [
-            {
-                "timestamp": message[0],
-                "sender": message[1],
-                "recipient": message[2],
-                "content": message[3]
-            }
-            for message in messages
-        ]
 
     except Exception as e:
         print(f"Error occurred: {e}")
