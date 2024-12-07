@@ -6,7 +6,6 @@ from db_api import register_user, get_user, save_message  # Import your API func
 from multiprocessing import Process, Queue
 import server
 import client
-import db_api
 
 # start server
 # events that can come through: new_msg, new_user, user_online

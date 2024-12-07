@@ -25,8 +25,6 @@ RUN pip install -r requirements.txt
 
 RUN mkdir /app
 COPY messenger.py /app
-COPY database_interaction.py /app
-COPY db_interaction.py /app
 COPY client.py /app
 COPY server.py /app
 COPY messaging.proto /app
