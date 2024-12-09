@@ -4,7 +4,7 @@ from datetime import datetime
 # Database configuration dictionary
 DB_CONFIG = {
     'driver': 'ODBC Driver 18 for SQL Server',
-    'server': 'sqlserver_good_test_node,1433',  # Use the container's IP
+    'server': 'test_sqlserver_1,1433',  # Use the container's IP
     'database': 'CryptomessengerDB',
     'username': 'SA',
     'password': 'WeHacking808',

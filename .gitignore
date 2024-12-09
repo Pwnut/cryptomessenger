@@ -6,3 +6,4 @@ proto/
 *.swp
 __pycache__
 capture.pcap
+test_data

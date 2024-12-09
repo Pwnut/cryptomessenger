@@ -2,10 +2,12 @@ import tkinter as tk
 from tkinter import messagebox
 from datetime import datetime
 import random
-from db_api import register_user, get_user, save_message  # Import your API functions
+from db_api import delete_user, register_user, get_user, save_message, get_messages  # Import your API functions
 from multiprocessing import Process, Queue
 import server
 import client
+import encryption
+from time import sleep
 
 # start server
 # events that can come through: new_msg, new_user, user_online
@@ -77,6 +79,9 @@ def load_contacts():
 
 # TODO how can we refresh this?
 # Load contacts and initialize the OptionMenu
+sleep(5)
+delete_user('127.0.0.1')
+register_user('127.0.0.1', encryption.serialize_pub_key(encryption.public_key).decode())
 contacts = load_contacts()
 user_selection = tk.StringVar(content_frame)
 user_selection.set(contacts[0])  # Set default value to the first contact (or "No Users Available")
@@ -92,6 +97,7 @@ status_label.pack(pady=5)
 def update_status():
     contact = user_selection.get()
     response = get_user(contact)
+    refresh_message_history(contact)
     if response and isinstance(response, dict):
         is_online = response.get("is_online", False)
         status_label.config(text=f"Status: {'Online' if is_online else 'Offline'}")
@@ -107,6 +113,15 @@ chat_history.pack(pady=5)
 def add_message_to_history(message):
     chat_history.insert(tk.END, message)
     chat_history.yview(tk.END)
+
+def refresh_message_history(ip):
+    chat_history.delete(0, tk.END)
+    messages = get_messages(ip)
+    print(messages)
+    for message in messages:
+        sender = "You" if message["sender"] == "127.0.0.1" else message["sender"]
+        recipient = "you" if message["recipient"] == "127.0.0.1" else message["recipient"]
+        add_message_to_history(f'{sender} sent to {recipient}: {message["content"]}')
 
 # Message Sent Confirmation Label
 message_sent_label = tk.Label(content_frame, text="", fg="green", bg="black", font=("Helvetica", 12))
@@ -141,16 +156,20 @@ def register_contact():
     contact_name = contact_entry.get()
     if contact_name:
         response = client.send_reg_request(host=contact_name)
-        if "message" in response:
+        if not response:
+            messagebox.showinfo("Contact NOT Registered", f"Could not reach {contact_name}.")
+        elif response == "ConnectionRefusedError":
+            messagebox.showinfo("Contact NOT Registered", f"Could not connect to {contact_name}.")
+        elif "message" in response:
             messagebox.showinfo("Contact Registered", f"{contact_name} has been registered.")
             update_contacts()
         else:
-            messagebox.showerror("Error", response.get("error", "Unknown error occurred"))
+            messagebox.showerror("Error", response.get("error", "Unknown error occurred."))
     else:
-        messagebox.showerror("Error", "Enter a valid contact name.")
+        messagebox.showerror("Error", "Please enter a contact name.")
 
 # Define Send Message function
-def send_message():
+def send():
     recipient = user_selection.get()
     message = message_entry.get()
     print(recipient)
@@ -161,7 +180,8 @@ def send_message():
             timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             response = save_message("127.0.0.1", recipient, timestamp, acked_mid, message)
             if "message" in response:
-                add_message_to_history(f"You to {recipient}: {message}")
+                if recipient == user_selection.get():
+                    add_message_to_history(f"You to {recipient}: {message}")
                 message_sent_label.config(text=f"Message Sent to {recipient}")
             else:
                 messagebox.showerror("Error", response.get("error", "Unknown error occurred"))
@@ -171,7 +191,7 @@ def send_message():
         messagebox.showerror("Error", "Select a user and enter a message.")
 
 # Send Message Button
-tk.Button(content_frame, text="Send Message", command=send_message, bg="black", fg="green").pack(pady=5)
+tk.Button(content_frame, text="Send Message", command=send, bg="black", fg="green").pack(pady=5)
 
 def poll_queue():
     global queue
@@ -187,7 +207,9 @@ def poll_queue():
                 timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 response = save_message(sender_ip, "127.0.0.1", timestamp, message_id, new_msg)
                 if "message" in response:
-                    add_message_to_history(f"{sender_ip} to you: {new_msg}")
+                    if response["message"] == "Message saved successfully.":
+                        if sender_ip == user_selection.get():
+                            add_message_to_history(f"{sender_ip} to you: {new_msg}")
                 else:
                     messagebox.showerror("Error", response.get("error", "Unknown error occurred"))
             elif event["type"] == "new_user":
@@ -202,6 +224,7 @@ def poll_queue():
     root.after(100, poll_queue)
 
 poll_queue()
+update_contacts()
 
 root.mainloop()
 messaging_server.terminate()

@@ -21,7 +21,6 @@ def send_packet(packet_data, host='127.0.0.1', port=5000):
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-            s.settimeout(5)
             s.bind(('0.0.0.0',5002))
             s.connect((host, port))
 
@@ -34,8 +33,7 @@ def send_packet(packet_data, host='127.0.0.1', port=5000):
             received_message.ParseFromString(resp_data)
             return received_message
     except ConnectionRefusedError:
-        return "ConnectionRefusedError"
-    except:
+        print(f'{host} not available')
         return None
 
 def send_message(pm, host='127.0.0.1', port=5000, preview=False):
